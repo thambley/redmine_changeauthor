@@ -1,5 +1,7 @@
 require 'redmine'
 
+require_dependency 'redmine_changeauthor/hooks'
+
 Redmine::Plugin.register :redmine_changeauthor do
 
   name 'Redmine ChangeAuthor plugin'

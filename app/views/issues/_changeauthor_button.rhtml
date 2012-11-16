@@ -1,0 +1,14 @@
+<%= stylesheet_link_tag "redmine_changeauthor.css", :plugin => 'redmine_changeauthor' %>
+<% if User.current.allowed_to?(:change_author, @project) %>
+	<script type="text/javascript">
+  document.observe("dom:loaded", function() {
+    $$('#content div.contextual a.icon-edit').each(function(e) {
+      e.insert(
+        {
+          before:'<%= link_to(l(:button_authorchange), {:controller => 'changeauthor', :action => 'index', :issue_id => @issue }, :class => 'icon icon-close redmine-authorchange-button') %>&nbsp;'
+        }
+      );
+    })
+  });
+  </script>
+<% end %>
