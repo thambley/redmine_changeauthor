@@ -20,18 +20,32 @@ class ChangeauthorController < ApplicationController
     
     @issue=Issue.find_by_id(params[:issue_id])
     
-    if @issue.update_attribute(:author_id, params[:authorid])
+    author_before_change = @issue.author_id
+    author_after_change = params[:authorid]
     
-      flash[:notice] = l(:notice_successful_update)
+    if author_before_change != author_after_change
       
-# TODO add log in history here
-#      flash[:notice] = "??? "
-#      call_hook(:controller_redmine_changeauthor_edit_after_save, { :author_id => params[:authorid], :issue => @issue })
+      if @issue.update_attribute(:author_id, author_after_change)
       
+        flash[:notice] = l(:notice_successful_update)
+
+        # journal attribute change
+        if Setting.plugin_redmine_changeauthor["redmine_changeauthor_log_setting"].to_s == "yes"
+          author_journal = Journal.new(:journalized => @issue, :user => User.current)
+          author_journal.details << JournalDetail.new(:property => 'attr', :prop_key => :author_id, :old_value => author_before_change, :value => author_after_change)
+          author_journal.save
+        end
+        
+        redirect_to :controller => "issues", :action => "show", :id => params[:issue_id]
+      else
+        redirect_to :controller => "changeauthor", :action => "edit", :id => params[:issue_id]
+      end
       
-      redirect_to :controller => "issues", :action => "show", :id => params[:issue_id]
     else
-      redirect_to :controller => "changeauthor", :action => "edit", :id => params[:issue_id]
+    
+      flash[:notice] = ("Author not updated")
+      redirect_to :controller => "issues", :action => "show", :id => params[:issue_id]
+      
     end
     
   end
