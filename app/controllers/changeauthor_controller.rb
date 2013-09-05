@@ -1,13 +1,12 @@
 class ChangeauthorController < ApplicationController
-  unloadable     
-  
-  layout 'admin'
+  unloadable
+  before_filter :find_project, :authorize
   
   def index
 
-    @issue=Issue.find_by_id(params[:issue_id])
+    #@issue=Issue.find_by_id(params[:issue_id])
     
-    @project = Project.find(@issue.project_id)
+    #@project = Project.find(@issue.project_id)
     
     @users = @project.member_principals.find(:all, :include => [:roles, :principal], :order => "firstname", :conditions => "#{Principal.table_name}.type='User'")
 
@@ -18,7 +17,7 @@ class ChangeauthorController < ApplicationController
     
   def edit
     
-    @issue=Issue.find_by_id(params[:issue_id])
+    #@issue=Issue.find_by_id(params[:issue_id])
     
     author_before_change = @issue.author_id
     author_after_change = params[:authorid]
@@ -49,14 +48,12 @@ class ChangeauthorController < ApplicationController
     end
     
   end
-  
-  private
-  
-  def find_and_destroy_relation(id)
-   
-   H4prelation.delete_all(["project_identifier = ?", id]) 
-   
-  end
-  
  
+  private
+
+  def find_project
+    # @project variable must be set before calling the authorize filter
+    @issue=Issue.find_by_id(params[:issue_id])
+    @project = Project.find(@issue.project_id)
+  end
 end
