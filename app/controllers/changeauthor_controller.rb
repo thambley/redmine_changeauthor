@@ -3,10 +3,6 @@ class ChangeauthorController < ApplicationController
   before_filter :find_project, :authorize
   
   def index
-
-    #@issue=Issue.find_by_id(params[:issue_id])
-    
-    #@project = Project.find(@issue.project_id)
     
     @users = @project.member_principals.find(:all, :include => [:roles, :principal], :order => "firstname", :conditions => "#{Principal.table_name}.type='User'")
 
@@ -16,8 +12,6 @@ class ChangeauthorController < ApplicationController
 
     
   def edit
-    
-    #@issue=Issue.find_by_id(params[:issue_id])
     
     author_before_change = @issue.author_id
     author_after_change = params[:authorid]
